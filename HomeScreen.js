@@ -2,11 +2,12 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { FlatList, Dimensions, StyleSheet } from "react-native";
 
-import Post from "./Post";
-import { getImagesPage } from "./photoRepository";
+import Post, { height as postHeight } from "./Post";
+import { presentError, mergeImagesArrays } from "./utils";
+import { getImages as rawGetImages, fetchNewerImages } from "./photoRepository";
 
-const screenWidth = Dimensions.get("window").width;
-const postHeight = screenWidth + 52 + 47.5 + 0.5;
+const pageSize = 10;
+const getImages = before => rawGetImages(pageSize, before);
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = () => ({
@@ -16,16 +17,12 @@ export default class HomeScreen extends React.Component {
     )
   });
 
-  state = { refreshing: true, images: [], pages: 0 };
+  state = { refreshing: true, images: [], loadingMore: false };
 
   componentDidMount() {
-    getImagesPage(this.state.pages).then(({ hits }) =>
-      this.setState({
-        images: hits,
-        refreshing: false,
-        pages: 1
-      })
-    );
+    getImages(this.state.images.length)
+      .then(this.handleFirstData)
+      .catch(this.handleError);
   }
 
   getItemLayout = (data, index) => ({
@@ -38,51 +35,60 @@ export default class HomeScreen extends React.Component {
 
   handleRefresh = () => this.setState({ refreshing: true }, this.refresh);
 
-  handleEndReached = () => {
-    if (this.state.refreshing) {
-      return;
-    }
-    getImagesPage(this.state.pages).then(this.handleNewData);
-  };
+  handleEndReached = () =>
+    !this.state.refreshing &&
+    !this.state.loadingMore &&
+    this.setState({ loadingMore: true }, this.loadMore);
 
-  handleNewData = ({ hits, page }) => {
-    if (page < this.state.pages) {
-      return;
-    }
+  loadMore = () =>
+    getImages(this.state.images.length)
+      .then(this.handleMoreData)
+      .catch(this.handleError);
 
+  handleFirstData = ({ images }) =>
     this.setState({
-      images: [...this.state.images, ...hits],
-      pages: this.state.pages + 1,
+      images: mergeImagesArrays(images, this.state.images),
+      refreshing: false
     });
-  }
+
+  handleMoreData = ({ images }) =>
+    this.setState({
+      images: mergeImagesArrays(this.state.images, images),
+      loadingMore: false
+    });
+
+  handleNewData = ({ images }) =>
+    this.setState({
+      images: mergeImagesArrays(images, this.state.images),
+      refreshing: false
+    });
+
+  handleError = error =>
+    this.setState({ refreshing: false, loadingMore: false }, () =>
+      presentError(error)
+    );
 
   refresh = () =>
-    setTimeout(
-      () =>
-        this.setState({
-          refreshing: false
-        }),
-      1000
-    );
+    fetchNewerImages(this.state.images[0] && this.state.images[0].id)
+      .then(this.handleNewData)
+      .catch(this.handleError);
 
   renderItem = ({ item }) => <Post key={item.key} image={item} />;
 
-  renderFlatList = () => (
-    <FlatList
-      style={styles.list}
-      data={this.state.images}
-      onEndReachedThreshold={0.5}
-      renderItem={this.renderItem}
-      onRefresh={this.handleRefresh}
-      keyExtractor={this.getItemKey}
-      refreshing={this.state.refreshing}
-      getItemLayout={this.getItemLayout}
-      onEndReached={this.handleEndReached}
-    />
-  );
-
   render() {
-    return this.renderFlatList();
+    return (
+      <FlatList
+        style={styles.list}
+        data={this.state.images}
+        onEndReachedThreshold={0.5}
+        renderItem={this.renderItem}
+        onRefresh={this.handleRefresh}
+        keyExtractor={this.getItemKey}
+        refreshing={this.state.refreshing}
+        getItemLayout={this.getItemLayout}
+        onEndReached={this.handleEndReached}
+      />
+    );
   }
 }
 

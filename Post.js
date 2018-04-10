@@ -12,8 +12,9 @@ import {
   Animated
 } from "react-native";
 import { GestureHandler, DangerZone } from "expo";
-import likeAnimation from "./likeAnimation";
 import { Octicons, MaterialCommunityIcons } from "@expo/vector-icons";
+
+import likeAnimation from "./likeAnimation";
 
 const { Lottie } = DangerZone;
 const { TapGestureHandler } = GestureHandler;
@@ -31,7 +32,7 @@ export default class Post extends React.Component {
       user: PropTypes.string.isRequired,
       webformatURL: PropTypes.string.isRequired,
       userImageURL: PropTypes.string.isRequired,
-      largeImageURL: PropTypes.string.isRequired,
+      largeImageURL: PropTypes.string.isRequired
     }).isRequired
   };
 
@@ -49,10 +50,15 @@ export default class Post extends React.Component {
     }
   };
 
-  handleKebabPressed = () => Share.share({ url: this.props.image.largeImageURL });
+  handleKebabPressed = () =>
+    Share.share({
+      url: this.props.image.largeImageURL
+    });
 
   handlePictureDoubleTapped = () =>
-    this.setState(({ postLiked }) => ({ postLiked: !postLiked }));
+    this.setState(({ postLiked }) => ({
+      postLiked: !postLiked
+    }));
 
   getOpacityAnimation = () =>
     Animated.sequence([
@@ -102,12 +108,14 @@ export default class Post extends React.Component {
 
   renderUser = () => (
     <View style={styles.user}>
-      {this.props.image.userImageURL ? (
-        <Image
-          style={styles.userAvatar}
-          source={{ uri: this.props.image.userImageURL }}
-        />
-      ) : null}
+      <Image
+        style={styles.userAvatar}
+        source={
+          this.props.image.userImageURL
+            ? { uri: this.props.image.userImageURL }
+            : null
+        }
+      />
       <Text style={styles.userName}>{this.props.image.user}</Text>
     </View>
   );
@@ -214,3 +222,5 @@ const styles = StyleSheet.create({
     padding: 100
   }
 });
+
+export const height = 52 + screenWidth + 47.5
