@@ -223,4 +223,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export const height = 52 + screenWidth + 47.5
+export const height = 52 + screenWidth + 47.5;

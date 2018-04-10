@@ -10,6 +10,8 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "primaryColor": "#4830E5",
+    "githubUrl": "https://github.com/SoftwareMansion/capturegram",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "cover",
