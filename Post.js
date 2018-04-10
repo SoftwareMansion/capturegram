@@ -28,9 +28,10 @@ export default class Post extends React.Component {
   static propTypes = {
     image: PropTypes.shape({
       id: PropTypes.number.isRequired,
-      webformatURL: PropTypes.string.isRequired,
       user: PropTypes.string.isRequired,
-      userImageURL: PropTypes.string.isRequired
+      webformatURL: PropTypes.string.isRequired,
+      userImageURL: PropTypes.string.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
     }).isRequired
   };
 
@@ -48,7 +49,7 @@ export default class Post extends React.Component {
     }
   };
 
-  handleKebabPressed = () => Share.share({ url: this.props.post.image.uri });
+  handleKebabPressed = () => Share.share({ url: this.props.image.largeImageURL });
 
   handlePictureDoubleTapped = () =>
     this.setState(({ postLiked }) => ({ postLiked: !postLiked }));
