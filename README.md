@@ -4,4 +4,4 @@ Impress your friends at parties with this simple Instagram-like mobile applicati
 
 ## Demo
 
-See it live on https://exp.host/@sjchmiela/capture-gram.
+See it live on https://exp.host/@sjchmiela/capture-gram or https://snack.expo.io/@sjchmiela/capturegram.

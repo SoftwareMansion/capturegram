@@ -2,37 +2,32 @@ import React from "react";
 import PropTypes from "prop-types";
 import {
   View,
+  Text,
   Image,
+  Share,
+  Easing,
+  Animated,
   Dimensions,
   StyleSheet,
-  Text,
-  Easing,
-  TouchableOpacity,
-  Share,
-  Animated
+  TouchableOpacity
 } from "react-native";
 import { GestureHandler, DangerZone } from "expo";
 import { Octicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import likeAnimation from "./likeAnimation";
+import likeAnimation from "../services/likeAnimation";
 
 const { Lottie } = DangerZone;
 const { TapGestureHandler } = GestureHandler;
 
 const screenWidth = Dimensions.get("window").width;
 
-const imagePropType = PropTypes.shape({
-  uri: PropTypes.string.isRequired
-});
-
 export default class Post extends React.Component {
   static propTypes = {
     image: PropTypes.shape({
       id: PropTypes.number.isRequired,
-      user: PropTypes.string.isRequired,
       webformatURL: PropTypes.string.isRequired,
-      userImageURL: PropTypes.string.isRequired,
-      largeImageURL: PropTypes.string.isRequired
+      user: PropTypes.string.isRequired,
+      userImageURL: PropTypes.string.isRequired
     }).isRequired
   };
 
@@ -44,15 +39,21 @@ export default class Post extends React.Component {
 
   componentDidUpdate = (prevProps, prevState) => {
     if (prevState.postLiked && !this.state.postLiked) {
-      this.animateDislike();
+      this.animateHeart({
+        duration: 1300,
+        toValue: 0
+      });
     } else if (!prevState.postLiked && this.state.postLiked) {
-      this.animateLike();
+      this.animateHeart({
+        duration: 1600,
+        toValue: 1
+      });
     }
   };
 
   handleKebabPressed = () =>
     Share.share({
-      url: this.props.image.largeImageURL
+      url: this.props.image.webformatURL
     });
 
   handlePictureDoubleTapped = () =>
@@ -73,26 +74,13 @@ export default class Post extends React.Component {
       })
     ]);
 
-  animateLike = () =>
+  animateHeart = options =>
     Animated.parallel([
       this.getOpacityAnimation(),
       Animated.sequence([
         Animated.timing(this.state.animationProgress, {
-          duration: 1600,
           easing: Easing.linear(),
-          toValue: 1
-        })
-      ])
-    ]).start();
-
-  animateDislike = () =>
-    Animated.parallel([
-      this.getOpacityAnimation(),
-      Animated.sequence([
-        Animated.timing(this.state.animationProgress, {
-          duration: 1300,
-          easing: Easing.linear(),
-          toValue: 0
+          ...options
         })
       ])
     ]).start();
@@ -106,16 +94,19 @@ export default class Post extends React.Component {
     </View>
   );
 
-  renderUser = () => (
-    <View style={styles.user}>
+  maybeRenderUserAvatar = () =>
+    this.props.image.userImageURL ? (
       <Image
         style={styles.userAvatar}
-        source={
-          this.props.image.userImageURL
-            ? { uri: this.props.image.userImageURL }
-            : null
-        }
+        source={{ uri: this.props.image.userImageURL }}
       />
+    ) : (
+      <View style={styles.userAvatar} />
+    );
+
+  renderUser = () => (
+    <View style={styles.user}>
+      {this.maybeRenderUserAvatar()}
       <Text style={styles.userName}>{this.props.image.user}</Text>
     </View>
   );
@@ -127,18 +118,15 @@ export default class Post extends React.Component {
         onPress={this.handlePictureDoubleTapped}
       >
         <MaterialCommunityIcons
-          name={`heart${!this.state.postLiked ? "-outline" : ""}`}
           size={32}
           color="#555"
+          name={`heart${!this.state.postLiked ? "-outline" : ""}`}
         />
       </TouchableOpacity>
     </View>
   );
 
   render() {
-    if (!this.props.image.webformatURL) {
-      return null;
-    }
     return (
       <View style={styles.container}>
         {this.renderHeader()}

@@ -1,10 +1,13 @@
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { FlatList, Dimensions, StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 
-import Post, { height as postHeight } from "./Post";
-import { presentError, mergeImagesArrays } from "./utils";
-import { getImages as rawGetImages, fetchNewerImages } from "./photoRepository";
+import Post, { height as postHeight } from "../components/Post";
+import { presentError, mergeImagesArrays } from "../services/utils";
+import {
+  getImages as rawGetImages,
+  fetchNewerImages
+} from "../services/photoRepository";
 
 const pageSize = 10;
 const getImages = before => rawGetImages(pageSize, before);

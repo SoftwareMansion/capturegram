@@ -6,10 +6,11 @@ import {
   withNavigationFocus
 } from "react-navigation"; // Version can be specified in package.json
 
-import HomeScreen from "./HomeScreen";
-import CameraScreen from "./CameraScreen";
-// import LikesScreen from './LikesScreen';
-import CameraScreenPlaceholder from "./CameraScreenPlaceholder";
+import HomeScreen from "./screens/HomeScreen";
+import CameraScreen from "./screens/CameraScreen";
+import CameraScreenPlaceholder from "./screens/CameraScreenPlaceholder";
+
+const expoColor = "#4830E5";
 
 const MainStack = StackNavigator(
   {
@@ -36,12 +37,12 @@ const Tabs = TabNavigator(
       iconStyle: {
         width: 28 // hardcoded value for icons /shrug
       },
-      activeTintColor: Platform.OS === "android" ? undefined : "#4830E5",
+      activeTintColor: Platform.OS === "android" ? undefined : expoColor,
       style:
         Platform.OS === "android"
           ? {
               paddingTop: Constants.statusBarHeight,
-              backgroundColor: "#4830E5"
+              backgroundColor: expoColor
             }
           : {},
       indicatorStyle: {
