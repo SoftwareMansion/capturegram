@@ -1,5 +1,5 @@
 import React from "react";
-import { Camera, Permissions } from "expo";
+import { Camera, Permissions, FileSystem } from "expo";
 import { Ionicons } from "@expo/vector-icons";
 import { View, StatusBar, TouchableOpacity, StyleSheet } from "react-native";
 
@@ -10,6 +10,9 @@ export default class CameraScreen extends React.Component {
 
   componentDidMount() {
     Permissions.askAsync(Permissions.CAMERA).then(this.handlePermissionStatus);
+    FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'photos').catch(e => {
+      return;// wtv, dir probably exists
+    });
   }
 
   handlePermissionStatus = ({ status }) =>
@@ -17,12 +20,22 @@ export default class CameraScreen extends React.Component {
       permissionsGranted: status === "granted"
     });
 
+  capturePhoto = async () => {
+    if (this.camera) {
+      const photo = await this.camera.takePictureAsync();
+      await FileSystem.moveAsync({
+        from: photo.uri,
+        to: `${FileSystem.documentDirectory}photos/Photo_${Date.now()}.jpg`
+      })
+    }
+  }
+
   dismiss = () => this.props.navigation.goBack();
 
   renderBlackScreen = () => <View style={styles.placeholder} />;
 
   renderCamera = () => (
-    <Camera style={styles.camera}>
+    <Camera style={styles.camera} ref={ ref => this.camera = ref } >
       <StatusBar hidden animated barStyle="dark-content" />
       <TouchableOpacity
         onPress={this.dismiss}
@@ -32,6 +45,7 @@ export default class CameraScreen extends React.Component {
         <Ionicons name="md-close" size={32} color="white" />
       </TouchableOpacity>
       <TouchableOpacity
+        onPress={this.capturePhoto}
         style={styles.captureButtonWrapper}
         hitSlop={{ top: 16, left: 16, right: 16, bottom: 16 }}
       >

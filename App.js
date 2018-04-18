@@ -9,6 +9,7 @@ import {
 import HomeScreen from "./screens/HomeScreen";
 import CameraScreen from "./screens/CameraScreen";
 import CameraScreenPlaceholder from "./screens/CameraScreenPlaceholder";
+import GalleryScreen from "./screens/GalleryScreen";
 
 const expoColor = "#4830E5";
 
@@ -28,7 +29,8 @@ const MainStack = StackNavigator(
 const Tabs = TabNavigator(
   {
     Home: { screen: MainStack },
-    Camera: { screen: withNavigationFocus(CameraScreenPlaceholder) }
+    Camera: { screen: withNavigationFocus(CameraScreenPlaceholder) },
+    Gallery: { screen: GalleryScreen }
   },
   {
     tabBarOptions: {

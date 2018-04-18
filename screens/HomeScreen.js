@@ -66,10 +66,11 @@ export default class HomeScreen extends React.Component {
       refreshing: false
     });
 
-  handleError = error =>
+  handleError = error =>{
+  console.log(error);
     this.setState({ refreshing: false, loadingMore: false }, () =>
       presentError(error)
-    );
+    );}
 
   refresh = () =>
     fetchNewerImages(this.state.images[0] && this.state.images[0].id)
