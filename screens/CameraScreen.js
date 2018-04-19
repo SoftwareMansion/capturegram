@@ -26,7 +26,7 @@ export default class CameraScreen extends React.Component {
       await FileSystem.moveAsync({
         from: photo.uri,
         to: `${FileSystem.documentDirectory}photos/Photo_${Date.now()}.jpg`
-      })
+      });
     }
   }
 
@@ -35,7 +35,11 @@ export default class CameraScreen extends React.Component {
   renderBlackScreen = () => <View style={styles.placeholder} />;
 
   renderCamera = () => (
-    <Camera style={styles.camera} ref={ ref => this.camera = ref } >
+    <Camera
+      style={styles.camera}
+      ref={ ref => this.camera = ref }
+      ratio="16:9"
+    >
       <StatusBar hidden animated barStyle="dark-content" />
       <TouchableOpacity
         onPress={this.dismiss}

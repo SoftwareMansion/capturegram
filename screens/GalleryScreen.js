@@ -1,14 +1,16 @@
 import React from "react";
 import { Camera, Permissions, FileSystem } from "expo";
-import { Ionicons } from '@expo/vector-icons';
+import { Foundation } from '@expo/vector-icons';
 import { View, Image, StyleSheet, FlatList } from "react-native";
+
+const PHOTO_DIR = `${FileSystem.documentDirectory}photos/`;
 
 export default class GalleryScreen extends React.Component {
   static navigationOptions = () => {
     return {
       title: 'Gallery',
       tabBarIcon: ({ tintColor }) => (
-        <Ionicons name="md-camera" size={32} color={tintColor} />
+        <Foundation name="thumbnails" size={32} color={tintColor} />
       ),
     };
   };
@@ -17,18 +19,20 @@ export default class GalleryScreen extends React.Component {
     photos: [],
   };
 
-  async componentDidMount() {
-    const photos = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + 'photos');
-    this.setState({ photos });
+  async componentWillMount() {
+    const dirInfo = await FileSystem.getInfoAsync(PHOTO_DIR);
+    if (dirInfo.exists) {
+      const photos = await FileSystem.readDirectoryAsync(PHOTO_DIR);
+      this.setState({ photos });
+    }
   }
 
-  renderPhoto(photoUri) {
+  renderPhoto({ item }) {
     return (
       <Image
-        key={photoUri}
         style={styles.photo}
         source={{
-          uri: `${FileSystem.documentDirectory}photos/${photoUri}`,
+          uri: `${FileSystem.documentDirectory}photos/${item}`,
         }}
       />
     );
@@ -36,19 +40,28 @@ export default class GalleryScreen extends React.Component {
 
   render() {
     return (
-      <FlatList
-        style={styles.list}
-        data={this.state.photos}
-        renderItem={this.renderPhoto}
-      />
+      <View style={styles.container} >
+        <FlatList
+          style={styles.list}
+          data={this.state.photos}
+          renderItem={this.renderPhoto}
+          keyExtractor={item => item}
+          numColumns={2}
+        />
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
   list: {
     flex: 1,
-    backgroundColor: "white",
   },
   photo: {
     margin: 5,
