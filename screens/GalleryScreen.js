@@ -20,10 +20,20 @@ export default class GalleryScreen extends React.Component {
   };
 
   async componentWillMount() {
-    const dirInfo = await FileSystem.getInfoAsync(PHOTO_DIR);
-    if (dirInfo.exists) {
-      const photos = await FileSystem.readDirectoryAsync(PHOTO_DIR);
-      this.setState({ photos });
+      const dirInfo = await FileSystem.getInfoAsync(PHOTO_DIR);
+      if (dirInfo.exists) {
+        const photos = await FileSystem.readDirectoryAsync(PHOTO_DIR);
+        this.setState({ photos });
+      } 
+  }
+
+  async componentDidUpdate() {
+    if (this.props.isFocused) {
+      const dirInfo = await FileSystem.getInfoAsync(PHOTO_DIR);
+      if (dirInfo.exists) {
+        const photos = await FileSystem.readDirectoryAsync(PHOTO_DIR);
+        this.setState({ photos });
+      } 
     }
   }
 

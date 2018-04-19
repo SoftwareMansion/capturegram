@@ -30,7 +30,7 @@ const Tabs = TabNavigator(
   {
     Home: { screen: MainStack },
     Camera: { screen: withNavigationFocus(CameraScreenPlaceholder) },
-    Gallery: { screen: GalleryScreen }
+    Gallery: { screen: withNavigationFocus(GalleryScreen) }
   },
   {
     tabBarOptions: {
